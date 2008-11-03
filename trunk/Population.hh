@@ -5,13 +5,16 @@
 
 #include <vector>
 
+#include "Individual.hh"
+
 class Population
 {
 	public:
 		Population();
 		~Population();
 		void updateFitness(MultiLayerPerceptron::Mlp& mlp);
+
 	private:
-		std::vector<double> fitness; /** The individuals' fitness */
+		std::vector<Individual> individuals; /** The individuals */
 };
 #endif
