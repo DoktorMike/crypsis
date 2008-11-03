@@ -4,6 +4,8 @@
 #include <neuralnethack/Config.hh>
 #include <neuralnethack/mlp/Mlp.hh>
 
+//#include "NeuralNetworkKeeper.hh"
+
 using std::string;
 using std::vector;
 
@@ -33,6 +35,7 @@ int main(int argc, char* argv[])
 {
 	Mlp* mlp = createMlp();
 	trainMlp(mlp);
+	//NeuralNetworkKeeper nnk;
 
 	/*while(){
 		scoreIndividuals();
