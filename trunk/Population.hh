@@ -12,6 +12,7 @@ class Population
 	public:
 		Population();
 		~Population();
+		std::vector<Individual>& getIndividuals() { return individuals; }
 		void updateFitness(MultiLayerPerceptron::Mlp& mlp);
 
 	private:
