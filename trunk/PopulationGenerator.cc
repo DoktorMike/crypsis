@@ -3,6 +3,7 @@
 
 #include <neuralnethack/datatools/CoreDataSet.hh>
 #include <neuralnethack/datatools/DataSet.hh>
+#include <neuralnethack/datatools/Normaliser.hh>
 
 #include <cmath>
 #include <algorithm>
@@ -10,6 +11,7 @@
 using DataTools::DataSet;
 using DataTools::Pattern;
 using DataTools::CoreDataSet;
+using DataTools::Normaliser;
 
 using std::vector;
 
@@ -18,16 +20,18 @@ PopulationGenerator::~PopulationGenerator()
 	gsl_rng_free (r);
 }
 
-DataSet* PopulationGenerator::createInitialDataSet()
+DataSet* PopulationGenerator::createInitialDataSet(uint n)
 {
 	CoreDataSet* coreDataSet = new CoreDataSet();
-	for(uint i=0; i<50; ++i){
+	for(uint i=0; i<n; ++i){
 		coreDataSet->addPattern(createIndividual());
 		coreDataSet->addPattern(createBackground1());
 	}
 	DataSet* dataSet = new DataSet();
 	dataSet->coreDataSet(*coreDataSet);
 
+	//Normaliser norm;
+	//norm.calcAndNormalise(*dataSet, true);
 	return dataSet;
 }
 
@@ -47,7 +51,7 @@ Pattern PopulationGenerator::createIndividual()
 Pattern PopulationGenerator::createBackground1()
 {
 	vector<double> genome; 
-	vector<double> target(1,1);
+	vector<double> target(1,0);
 	Individual individual;
 
 	/* Background 1 contains 2 1's and 1 3's */
@@ -67,7 +71,7 @@ Pattern PopulationGenerator::createBackground1()
 Pattern PopulationGenerator::createBackground2()
 {
 	vector<double> genome; 
-	vector<double> target(1,1);
+	vector<double> target(1,0);
 	Individual individual;
 
 	/* Background 1 contains 2 2's and 1 4's */

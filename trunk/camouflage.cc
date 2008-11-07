@@ -1,29 +1,18 @@
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include <neuralnethack/Config.hh>
 #include <neuralnethack/mlp/Mlp.hh>
 
-//#include "NeuralNetworkKeeper.hh"
+#include "NeuralNetworkKeeper.hh"
 
 using std::string;
 using std::vector;
+using std::cout;
 
 using namespace NeuralNetHack;
 using namespace MultiLayerPerceptron;
-
-Mlp* createMlp()
-{
-	vector<uint> arch; arch.push_back(8); arch.push_back(1); arch.push_back(1);
-	vector<string> types; types.push_back("tansig"); types.push_back("logsig");
-	Mlp* mlp = new Mlp(arch, types, false);
-	return mlp;
-}
-
-bool trainMlp(Mlp* mlp)
-{
-	return true;
-}
 
 bool cleanup(Mlp* mlp)
 {
@@ -33,9 +22,9 @@ bool cleanup(Mlp* mlp)
 
 int main(int argc, char* argv[])
 {
-	Mlp* mlp = createMlp();
-	trainMlp(mlp);
-	//NeuralNetworkKeeper nnk;
+	NeuralNetworkKeeper nnk;
+	nnk.train();
+	nnk.printCurrentDataSet(cout);
 
 	/*while(){
 		scoreIndividuals();
@@ -43,6 +32,5 @@ int main(int argc, char* argv[])
 		migrate();
 		replicate();
 	}*/
-	cleanup(mlp);
 	return EXIT_SUCCESS;
 }
