@@ -6,7 +6,10 @@
 #include <neuralnethack/Config.hh>
 #include <neuralnethack/mlp/Mlp.hh>
 #include <neuralnethack/mlp/QuasiNewton.hh>
+#include <neuralnethack/mlp/GradientDescent.hh>
 #include <neuralnethack/datatools/DataSet.hh>
+
+#include <iostream>
 
 class NeuralNetworkKeeper
 {
@@ -15,10 +18,13 @@ class NeuralNetworkKeeper
 		virtual ~NeuralNetworkKeeper();
 
 		void train(void);
+		MultiLayerPerceptron::Mlp& getMlp() { return *mlp; }
+		void printCurrentDataSet(std::ostream& os);
 
 	private:
 		MultiLayerPerceptron::Mlp* mlp;
-		MultiLayerPerceptron::QuasiNewton* trainer;
+		//MultiLayerPerceptron::QuasiNewton* trainer;
+		MultiLayerPerceptron::GradientDescent* trainer;
 		DataTools::DataSet* dataSet;
 		PopulationGenerator dataGenerator;
 };

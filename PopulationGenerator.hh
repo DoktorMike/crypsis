@@ -14,7 +14,7 @@ class PopulationGenerator
 		PopulationGenerator() { gsl_rng_env_setup(); T = gsl_rng_default; r = gsl_rng_alloc (T); }
 		~PopulationGenerator();
 		double drawRandomNumber() { return gsl_rng_uniform (r); }
-		DataTools::DataSet* createInitialDataSet();
+		DataTools::DataSet* createInitialDataSet(uint n);
 	private:
 		const gsl_rng_type * T;
 		gsl_rng * r;

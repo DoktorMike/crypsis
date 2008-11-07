@@ -5,25 +5,36 @@
 #include <neuralnethack/mlp/Mlp.hh>
 #include <neuralnethack/mlp/CrossEntropy.hh>
 #include <neuralnethack/mlp/QuasiNewton.hh>
+#include <neuralnethack/mlp/GradientDescent.hh>
 #include <neuralnethack/datatools/DataSet.hh>
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
 
 using namespace NeuralNetHack;
 using namespace MultiLayerPerceptron;
 
 using std::vector;
 using std::string;
+using std::cout;
+using std::ostream;
+using std::copy;
+using std::ostream_iterator;
+
 
 NeuralNetworkKeeper::NeuralNetworkKeeper():mlp(0), trainer(0), dataSet(0)
 {
 	vector<uint> arch; arch.push_back(8); arch.push_back(1); arch.push_back(1);
 	vector<string> types; types.push_back("tansig"); types.push_back("logsig");
 	mlp = new Mlp(arch, types, false);
-	dataSet = dataGenerator.createInitialDataSet();
+	dataSet = dataGenerator.createInitialDataSet(100);
 	CrossEntropy* cee = new CrossEntropy(*mlp, *dataSet);
-	trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-5, 1e5);
+	//trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
+	trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
+	trainer->numEpochs(1000);
 }
 
 NeuralNetworkKeeper::~NeuralNetworkKeeper()
@@ -36,5 +47,16 @@ NeuralNetworkKeeper::~NeuralNetworkKeeper()
 
 void NeuralNetworkKeeper::train()
 {
+	trainer->train(cout);
+}
+
+void NeuralNetworkKeeper::printCurrentDataSet(ostream& os)
+{
+	for(uint i=0; i<dataSet->size(); ++i){
+		vector<double>& input = dataSet->pattern(i).input();
+		vector<double>& output = dataSet->pattern(i).output();
+		copy(input.begin(), input.end(), ostream_iterator<double>(os, " ")); os<<"\t";
+		copy(output.begin(), output.end(), ostream_iterator<double>(os, " ")); os<<std::endl;
+	}
 }
 
