@@ -50,6 +50,23 @@ void NeuralNetworkKeeper::train()
 	trainer->train(cout);
 }
 
+/*void convertDataToPopulation(Population& population)
+{
+	for(uint i=0; i<dataSet.size(); ++i){
+		Pattern& p = dataSet.pattern(i);
+
+		if(){
+		}
+	}
+}
+*/
+/*
+void NeuralNetworkKeeper::refreshDataSet()
+{
+	if(dataSet != 0) delete dataSet;
+	dataSet = dataGenerator.createInitialDataSet(100);
+}
+*/
 void NeuralNetworkKeeper::printCurrentDataSet(ostream& os)
 {
 	for(uint i=0; i<dataSet->size(); ++i){
