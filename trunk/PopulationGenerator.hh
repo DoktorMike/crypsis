@@ -15,13 +15,14 @@ class PopulationGenerator
 		~PopulationGenerator();
 		double drawRandomNumber() { return gsl_rng_uniform (r); }
 		DataTools::DataSet* createInitialDataSet(uint n);
-	private:
-		const gsl_rng_type * T;
-		gsl_rng * r;
 
 		DataTools::Pattern createIndividual();
 		DataTools::Pattern createBackground1();
 		DataTools::Pattern createBackground2();
+	private:
+		const gsl_rng_type * T;
+		gsl_rng * r;
+
 };
 
 #endif

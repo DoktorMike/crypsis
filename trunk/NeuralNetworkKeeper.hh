@@ -27,6 +27,7 @@ class NeuralNetworkKeeper
 		MultiLayerPerceptron::GradientDescent* trainer;
 		DataTools::DataSet* dataSet;
 		PopulationGenerator dataGenerator;
+		//const uint sampleSize;
 };
 
 #endif
