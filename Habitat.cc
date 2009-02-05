@@ -9,6 +9,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <iterator>
 
 using DataTools::Pattern;
 using DataTools::DataSet;
@@ -16,11 +17,13 @@ using DataTools::CoreDataSet;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::ostream_iterator;
+using std::copy;
 
-Habitat::Habitat(HabitatType type):individuals(maxSize), type(type), pg(new PopulationGenerator()), predator(new Predator())
+Habitat::Habitat(HabitatType type):pg(new PopulationGenerator()), individuals(maxSize, *pg), type(type), predator(new Predator())
 {
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
-		Individual individual;
+		Individual individual(*pg);
 		*it = individual;
 	}
 	trainPredator(false);
@@ -43,11 +46,15 @@ double Habitat::getAverageFitness()
 {
 	double average = 0;
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
-		vector<double> bgtemp = createBackground().input();
-		double tmp1 = predator->predate(bgtemp);
-		double tmp = it->getFitness();
-		cout<<tmp<<"\t"<<tmp1<<endl;
-		average+=tmp;
+		vector<double> bggenome = createBackground().input();
+		double bgfitness = 1-predator->predate(bggenome);
+		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(cout, " "));
+		cout<<": "<<bgfitness<<"\t";
+		double indfitness = it->getFitness();
+		copy(it->getGenome().begin(), it->getGenome().end(), ostream_iterator<double>(cout, " "));
+		cout<<": "<<indfitness<<endl;
+		//double tmp = 1-predator->predate(it->getGenome());
+		average+=indfitness;
 
 	}
 	return average/individuals.size();
@@ -88,7 +95,7 @@ Pattern Habitat::createBackground()
 
 Pattern Habitat::createIndividual()
 {
-	Individual individual;
+	Individual individual(*pg);
 	return individual.getPattern();
 }
 

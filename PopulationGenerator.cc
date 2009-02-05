@@ -15,6 +15,13 @@ using DataTools::Normaliser;
 
 using std::vector;
 
+PopulationGenerator::PopulationGenerator()
+{ 
+	gsl_rng_env_setup(); 
+	T = gsl_rng_default; 
+	r = gsl_rng_alloc (T);  
+}
+
 PopulationGenerator::~PopulationGenerator()
 { 
 	gsl_rng_free (r);
@@ -39,7 +46,7 @@ Pattern PopulationGenerator::createIndividual()
 {
 	vector<double> genome;
 	vector<double> target(1,1);
-	Individual individual;
+	Individual individual(*this);
 
 	for(uint i=0; i<individual.genomeSize; ++i)
 		genome.push_back(round(drawRandomNumber()*individual.maxGenomeVal));
@@ -52,7 +59,7 @@ Pattern PopulationGenerator::createBackground1()
 {
 	vector<double> genome; 
 	vector<double> target(1,0);
-	Individual individual;
+	Individual individual(*this);
 
 	/* Background 1 contains 2 1's and 1 3's */
 	genome.push_back(1); genome.push_back(1); genome.push_back(3);
@@ -72,7 +79,7 @@ Pattern PopulationGenerator::createBackground2()
 {
 	vector<double> genome; 
 	vector<double> target(1,0);
-	Individual individual;
+	Individual individual(*this);
 
 	/* Background 1 contains 2 2's and 1 4's */
 	genome.push_back(2); genome.push_back(2); genome.push_back(4);

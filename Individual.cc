@@ -9,11 +9,10 @@
 using std::vector;
 using DataTools::Pattern;
 
-Individual::Individual():fitness(0), genome(0)
+Individual::Individual(PopulationGenerator& pg):fitness(0), genome(0)
 {
-	PopulationGenerator pg;
 	for(uint i=0; i<genomeSize; ++i)
-		genome.push_back(round(pg.drawRandomNumber()*maxGenomeVal));
+		genome.push_back(pg.drawRandomNumber(maxGenomeVal+1));
 }
 
 Individual::~Individual()
@@ -26,4 +25,3 @@ Pattern Individual::getPattern()
 	Pattern pattern("", genome, target);
 	return pattern;
 }
-

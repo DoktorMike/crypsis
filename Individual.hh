@@ -1,6 +1,8 @@
 #ifndef _Individual_h_
 #define _Individual_h_
 
+#include "PopulationGenerator.hh"
+
 #include <vector>
 
 #include <neuralnethack/datatools/Pattern.hh>
@@ -9,7 +11,7 @@ class Individual
 {
 	public:
 
-		Individual();
+		Individual(PopulationGenerator& pg);
 		~Individual();
 		double getFitness(){ return fitness; }
 		void setFitness(double fitness){ this->fitness = fitness; }
