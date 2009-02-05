@@ -23,17 +23,18 @@ using std::cout;
 using std::ostream;
 using std::copy;
 using std::ostream_iterator;
+using DataTools::DataSet;
 
-
-NeuralNetworkKeeper::NeuralNetworkKeeper():mlp(0), trainer(0), dataSet(0)
+/** TODO: Make sure this initial dataset is handled in a better way! */
+NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSet(0)
 {
-	vector<uint> arch; arch.push_back(8); arch.push_back(1); arch.push_back(1);
+	vector<uint> arch; arch.push_back(numVar); arch.push_back(1); arch.push_back(1);
 	vector<string> types; types.push_back("tansig"); types.push_back("logsig");
 	mlp = new Mlp(arch, types, false);
 	dataSet = dataGenerator.createInitialDataSet(100);
 	CrossEntropy* cee = new CrossEntropy(*mlp, *dataSet);
-	//trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
-	trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
+	trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
+	//trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
 	trainer->numEpochs(1000);
 }
 
@@ -45,9 +46,14 @@ NeuralNetworkKeeper::~NeuralNetworkKeeper()
 	if(dataSet != 0) delete dataSet;
 }
 
-void NeuralNetworkKeeper::train()
+void NeuralNetworkKeeper::train(DataSet& dataset)
 {
-	trainer->train(cout);
+	trainer->train(*mlp, dataset, cout);
+}
+
+double NeuralNetworkKeeper::propagate(vector<double>& genome)
+{
+	return mlp->propagate(genome).front();
 }
 
 /*void convertDataToPopulation(Population& population)
