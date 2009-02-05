@@ -33,8 +33,8 @@ NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSe
 	mlp = new Mlp(arch, types, false);
 	dataSet = dataGenerator.createInitialDataSet(100);
 	CrossEntropy* cee = new CrossEntropy(*mlp, *dataSet);
-	//trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
-	trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
+	trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
+	//trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
 	trainer->numEpochs(1000);
 }
 
