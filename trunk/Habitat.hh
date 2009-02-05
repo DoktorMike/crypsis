@@ -29,9 +29,9 @@ class Habitat
 		static const uint maxSize = 100; /** The maximum number of Individual in this habitat */
 
 	private:
+		PopulationGenerator* pg; /** The random number generator. */
 		std::vector<Individual> individuals; /** The list of Individual living in this habitat */
 		const uint type; /** The habitat type */
-		PopulationGenerator* pg; /** The random number generator. */
 		Predator* predator; /** The Predator */
 
 		/** Creates a random background sample. */

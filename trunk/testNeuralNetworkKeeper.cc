@@ -109,7 +109,14 @@ int main(int argc, char* argv[])
 	//nnh.getMlp().regenerateWeights();
 	//nnh.getMlp().regenerateWeights();
 	nnh.train(ds);
+	cout<<nnh.propagate(createIndividual().input())<<endl;
+	cout<<nnh.propagate(createBackground1().input())<<endl;
 	
+	for(uint i=0; i<10; ++i){
+		PopulationGenerator pg;
+		cout<<pg.drawRandomNumber()<<endl;
+	}
+
 	//Cleanup
 	ds.killCoreData();
 
