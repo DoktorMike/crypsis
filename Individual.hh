@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <neuralnethack/datatools/Pattern.hh>
+
 class Individual
 {
 	public:
@@ -13,6 +15,8 @@ class Individual
 		void setFitness(double fitness){ this->fitness = fitness; }
 
 		std::vector<double>& getGenome() { return genome; }
+
+		DataTools::Pattern getPattern();
 
 		static const uint genomeSize = 8; /** The number of genes in the genome */
 		static const uint maxGenomeVal = 4; /** The maximum value a gene can have */
