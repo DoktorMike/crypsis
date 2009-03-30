@@ -17,6 +17,7 @@ class Individual
 		void setFitness(double fitness){ this->fitness = fitness; }
 
 		std::vector<double>& getGenome() { return genome; }
+		void setGenome(std::vector<double>& genome) { this->genome = genome; }
 
 		DataTools::Pattern getPattern();
 

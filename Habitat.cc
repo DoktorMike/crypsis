@@ -26,7 +26,7 @@ Habitat::Habitat(HabitatType type):pg(new PopulationGenerator()), individuals(ma
 		Individual individual(*pg);
 		*it = individual;
 	}
-	trainPredator(false);
+	trainPredator(true);
 }
 
 Habitat::~Habitat()
@@ -45,9 +45,11 @@ void Habitat::scoreIndividuals()
 double Habitat::getAverageFitness()
 {
 	double average = 0;
+	double bgAverage = 0;
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
 		vector<double> bggenome = createBackground().input();
 		double bgfitness = 1-predator->predate(bggenome);
+		bgAverage += bgfitness;
 		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(cout, " "));
 		cout<<": "<<bgfitness<<"\t";
 		double indfitness = it->getFitness();
@@ -57,6 +59,7 @@ double Habitat::getAverageFitness()
 		average+=indfitness;
 
 	}
+	cout<<"Fitness: "<<average/individuals.size()<<"\tBgFitness: "<<bgAverage/individuals.size()<<endl;
 	return average/individuals.size();
 }
 
@@ -118,6 +121,21 @@ DataSet Habitat::createDataSet()
 	return ds;
 }
 
+DataSet Habitat::createFeedbackDataSet()
+{
+	CoreDataSet* cds = new CoreDataSet();
+	DataSet ds;
+	for(uint i=0; i<individuals.size(); ++i){
+		cds->addPattern(createBackground());
+		if(individuals[i].getFitness() < 0.5){
+			cds->addPattern(createBackground());
+			cds->addPattern(individuals[i].getPattern());
+		}
+	}
+	ds.coreDataSet(*cds);
+	return ds;
+}
+
 DataSet Habitat::createNewDataSet()
 {
 	CoreDataSet* cds = new CoreDataSet();
@@ -132,7 +150,37 @@ DataSet Habitat::createNewDataSet()
 
 void Habitat::trainPredator(bool init)
 {
-	DataSet ds = init == true ? createNewDataSet() : createDataSet();
-	predator->train(ds);
+	DataSet ds = init == true ? createNewDataSet() : createFeedbackDataSet();
+	cout<<"DataSet Size: "<<ds.size()<<endl;
+	if(ds.size() > 0){
+		predator->train(ds);
+	}
+	//predator->printCurrentDataSet(cout);
 	ds.killCoreData();
+}
+
+void Habitat::killOffPrey()
+{
+	vector<Individual>::iterator it=individuals.begin(); 
+	while(it!=individuals.end())
+		if(it->getFitness() < 0.5)
+			it = individuals.erase(it);
+		else
+			++it;
+}
+
+void Habitat::replicate(){
+	vector<Individual> tmp;
+	for(uint i=0; i<individuals.size(); ++i){
+		uint rnd1 = pg->drawRandomNumber(individuals.size());
+		uint rnd2 = pg->drawRandomNumber(individuals.size());
+		vector<double> genome;
+		vector<double> genome1 = individuals[rnd1].getGenome();
+		genome.insert(genome.end(), genome1.begin(), genome1.begin()+genome1.size()/2);
+		vector<double> genome2 = individuals[rnd2].getGenome();
+		genome.insert(genome.end(), genome2.begin()+genome2.size()/2, genome2.end());
+		Individual individual(*pg);
+		individual.setGenome(genome);
+		tmp.push_back(individual);
+	}
 }
