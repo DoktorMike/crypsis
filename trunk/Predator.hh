@@ -7,6 +7,7 @@
 #include <neuralnethack/datatools/DataSet.hh>
 
 #include <vector>
+#include <iostream>
 
 class Predator
 {
@@ -18,6 +19,7 @@ class Predator
 		void reset();
 		double predate(std::vector<double>& genome);
 		void predate(Individual& individual);
+		void printCurrentDataSet(std::ostream& os);
 
 	private:
 		NeuralNetworkKeeper nnh;

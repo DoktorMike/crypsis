@@ -112,9 +112,9 @@ int main(int argc, char* argv[])
 	cout<<nnh.propagate(createIndividual().input())<<endl;
 	cout<<nnh.propagate(createBackground1().input())<<endl;
 	
-	for(uint i=0; i<10; ++i){
-		PopulationGenerator pg;
-		cout<<pg.drawRandomNumber()<<endl;
+	PopulationGenerator pg;
+	for(uint i=0; i<20; ++i){
+		cout<<pg.drawRandomNumber(4)<<" ";
 	}
 
 	//Cleanup

@@ -2,9 +2,11 @@
 #include "Individual.hh"
 
 #include <vector>
+#include <iostream>
 
 using DataTools::DataSet;
 using std::vector;
+using std::ostream;
 
 Predator::Predator() {}
 Predator::~Predator() {}
@@ -26,5 +28,10 @@ double Predator::predate(vector<double>& genome)
 void Predator::predate(Individual& individual)
 {
 	individual.setFitness(1-nnh.propagate(individual.getGenome()));
+}
+
+void Predator::printCurrentDataSet(ostream& os)
+{
+	nnh.printCurrentDataSet(os);
 }
 

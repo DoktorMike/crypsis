@@ -75,7 +75,11 @@ int main(int argc, char* argv[])
 	while(true){
 		h1.scoreIndividuals();
 		cout<<"Average Fitness: "<<h1.getAverageFitness()<<endl;
+		cout<<"Number of individuals: "<<h1.getNumIndividuals()<<endl;
 		sleep(1);
+		h1.trainPredator(false);
+		h1.killOffPrey();
+		h1.replicate();
 		/*
 		   h1.replicate();
 		   scoreIndividuals();
