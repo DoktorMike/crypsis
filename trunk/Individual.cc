@@ -1,6 +1,7 @@
 #include "Individual.hh"
 
 #include "PopulationGenerator.hh"
+#include "Constants.hh"
 
 #include <neuralnethack/datatools/Pattern.hh>
 

@@ -21,8 +21,6 @@ class Individual
 
 		DataTools::Pattern getPattern();
 
-		static const uint genomeSize = 8; /** The number of genes in the genome */
-		static const uint maxGenomeVal = 4; /** The maximum value a gene can have */
 	private:
 		double fitness; /** The fitness of the individual */
 		std::vector<double> genome; /** The genome of the individual */
