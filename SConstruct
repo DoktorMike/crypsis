@@ -1,6 +1,6 @@
 import os
 env = Environment(ENV = {'PATH' : os.environ['PATH']});
-common = ['Habitat.cc', 'Predator.cc', 'Individual.cc', 'NeuralNetworkKeeper.cc', 'PopulationGenerator.cc']
+common = ['Habitat.cc', 'Predator.cc', 'Individual.cc', 'NeuralNetworkKeeper.cc', 'PopulationGenerator.cc', 'Constants.hh']
 #camouflage_files = ['camouflage.cc'] + common
 #test_files = ['testNeuralNetworkKeeper.cc'] + common
 env.Library('camouflagebase', common, 

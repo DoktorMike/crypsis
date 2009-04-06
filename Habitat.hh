@@ -22,7 +22,8 @@ class Habitat
 
 		void scoreIndividuals(); /** Make the Predator run through the Habitat. */
 		void killOffPrey(); /** Make the Predator run through the Habitat. */
-		double getAverageFitness(); /** Get the average fitness of the poplulation. */
+		double getAverageSum(); /** Get the average sum of all alleles in the genome of the population. */
+		double getAverageFitness(); /** Get the average fitness of the population. */
 		uint getNumIndividuals() { return individuals.size(); } /** Get the number of Individual in this Habitat. */
 
 		/** Trains the Predator on the Habitat. */
@@ -31,9 +32,6 @@ class Habitat
 		/** Creates a new population from the old one. */
 		void replicate();
 
-		static const uint genomeSize = 8; /** The number of genes in the genome */
-		static const uint maxGenomeVal = 4; /** The maximum value a gene can have */
-		static const uint maxSize = 100; /** The maximum number of Individual in this habitat */
 
 	private:
 		PopulationGenerator* pg; /** The random number generator. */

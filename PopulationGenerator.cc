@@ -1,5 +1,6 @@
 #include "PopulationGenerator.hh"
 #include "Individual.hh"
+#include "Constants.hh"
 
 #include <neuralnethack/datatools/CoreDataSet.hh>
 #include <neuralnethack/datatools/DataSet.hh>
@@ -48,8 +49,8 @@ Pattern PopulationGenerator::createIndividual()
 	vector<double> target(1,1);
 	Individual individual(*this);
 
-	for(uint i=0; i<individual.genomeSize; ++i)
-		genome.push_back(round(drawRandomNumber()*individual.maxGenomeVal));
+	for(uint i=0; i<genomeSize; ++i)
+		genome.push_back(round(drawRandomNumber()*maxGenomeVal));
 
 	Pattern pattern("", genome, target);
 	return pattern;
@@ -65,8 +66,8 @@ Pattern PopulationGenerator::createBackground1()
 	genome.push_back(1); genome.push_back(1); genome.push_back(3);
 
 	/* Fill up with numbers != 1 and 3 */
-	while(genome.size() < individual.genomeSize){
-		uint value = round(drawRandomNumber()*individual.maxGenomeVal);
+	while(genome.size() < genomeSize){
+		uint value = round(drawRandomNumber()*maxGenomeVal);
 		if(value != 1 and value != 3) genome.push_back(value);
 	}
 	random_shuffle(genome.begin(), genome.end());
@@ -85,8 +86,8 @@ Pattern PopulationGenerator::createBackground2()
 	genome.push_back(2); genome.push_back(2); genome.push_back(4);
 
 	/* Fill up with numbers != 2 and 4 */
-	while(genome.size() < individual.genomeSize){
-		uint value = round(drawRandomNumber()*individual.maxGenomeVal);
+	while(genome.size() < genomeSize){
+		uint value = round(drawRandomNumber()*maxGenomeVal);
 		if(value != 2 and value != 4) genome.push_back(value);
 	}
 	random_shuffle(genome.begin(), genome.end());

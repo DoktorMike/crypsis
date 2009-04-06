@@ -35,6 +35,7 @@ NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSe
 	CrossEntropy* cee = new CrossEntropy(*mlp, *dataSet);
 	//trainer = new QuasiNewton(*mlp, *dataSet, *cee, 1e-15, 1000);
 	trainer = new GradientDescent(*mlp, *dataSet, *cee, 1e-15, 10, 0.02, 0.9, 0.8);
+	dataSet->killCoreData(); delete dataSet; dataSet=0; //Ugly, but this makes sure this initial trainingSet is never used.
 	trainer->numEpochs(1000);
 }
 
@@ -43,7 +44,10 @@ NeuralNetworkKeeper::~NeuralNetworkKeeper()
 	if(mlp != 0) delete mlp;
 	if(trainer->error() != 0) delete trainer->error();
 	if(trainer != 0) delete trainer;
-	if(dataSet != 0) delete dataSet;
+	if(dataSet != 0){
+		dataSet->killCoreData(); 
+		delete dataSet; 
+	}
 }
 
 void NeuralNetworkKeeper::train(DataSet& dataset)
