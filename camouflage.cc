@@ -71,23 +71,25 @@ int main(int argc, char* argv[])
 	*/
 
 	Habitat h1(H1);
+	Habitat h2(H2);
 
 	while(true){
 		h1.scoreIndividuals();
-		cout<<"Average Fitness: "<<h1.getAverageFitness()<<endl;
-		cout<<"Average Sum: "<<h1.getAverageSum()<<endl;
-		cout<<"Number of individuals: "<<h1.getNumIndividuals()<<endl;
+		h2.scoreIndividuals();
+		cout<<"Average Fitness: H1 = "<<h1.getAverageFitness()<<" H2 = "<<h2.getAverageFitness()<<endl;
+		cout<<"Average Background Fitness: H1 = "<<h1.getAverageBackgroundFitness()<<" H2 = "<<h2.getAverageBackgroundFitness()<<endl;
+		//cout<<"Average Sum: H1 = "<<h1.getAverageSum()<<" H2 = "<<h2.getAverageSum()<<endl;
+		cout<<"Number of individuals: H1 = "<<h1.getNumIndividuals()<<" H2 = "<<h2.getNumIndividuals()<<endl;
 		sleep(1);
 		h1.trainPredator(false);
-		h1.killOffPrey();
+		h2.trainPredator(false);
+		uint n1Killed = h1.killOffPrey();
+		uint n2Killed = h2.killOffPrey();
+		cout<<"Killed off: H1 = "<<n1Killed<<" H2 = "<<n2Killed<<" individuals"<<endl;
 		h1.replicate();
-		/*
-		   h1.replicate();
-		   scoreIndividuals();
-		   killOffPrey();
-		   migrate();
-		   replicate();
-		   */
+		h2.replicate();
+
+		h1.migrate(h2);
 	}
 	return EXIT_SUCCESS;
 }

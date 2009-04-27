@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
+#include <iostream>
 
 using DataTools::Pattern;
 using DataTools::DataSet;
@@ -23,6 +24,7 @@ using std::ostream_iterator;
 using std::copy;
 using std::accumulate;
 using std::fill;
+using std::ostream;
 
 Habitat::Habitat(HabitatType type):pg(new PopulationGenerator()), individuals(maxSize, *pg), type(type), predator(new Predator())
 {
@@ -55,7 +57,7 @@ double Habitat::getAverageSum()
 		vector<double> bggenome = createBackground().input();
 		bgSum += accumulate(bggenome.begin(), bggenome.end(), 0);
 	}
-	cout<<"FeatureNum: "<<sum/individuals.size()<<"\tBgFeatureNum: "<<bgSum/individuals.size()<<endl;
+	//cout<<"FeatureNum: "<<sum/individuals.size()<<"\tBgFeatureNum: "<<bgSum/individuals.size()<<endl;
 	return sum/individuals.size();
 }
 
@@ -65,55 +67,52 @@ double Habitat::getAverageFitness()
 	double bgAverage = 0;
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
 		double indfitness = it->getFitness();
-		/*
-		cout<<"Individual: ";
-		copy(it->getGenome().begin(), it->getGenome().end(), ostream_iterator<double>(cout, " "));
-		cout<<": "<<indfitness<<"\t";
-		*/
 		average+=indfitness;
 		vector<double> bggenome = createBackground().input();
 		double bgfitness = 1-predator->predate(bggenome);
 		bgAverage += bgfitness;
-		/*
-		cout<<"Background: ";
-		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(cout, " "));
-		cout<<": "<<bgfitness<<endl;
-		*/
 	}
-	cout<<"Fitness: "<<average/individuals.size()<<"\tBgFitness: "<<bgAverage/individuals.size()<<endl;
 	return average/individuals.size();
 }
 
-/** TODO: Fix the number of genes present.
- */
+double Habitat::getAverageBackgroundFitness()
+{
+	double bgAverage = 0;
+	for(uint i=0; i<individuals.size(); ++i)
+		bgAverage += 1-predator->predate(createBackground().input());
+	return bgAverage/individuals.size();
+}
+
+void Habitat::printIndividuals(ostream& os)
+{
+	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
+		double indfitness = it->getFitness();
+		cout<<"Individual: ";
+		copy(it->getGenome().begin(), it->getGenome().end(), ostream_iterator<double>(cout, " "));
+		cout<<": "<<indfitness<<"\t";
+		vector<double> bggenome = createBackground().input();
+		double bgfitness = 1-predator->predate(bggenome);
+		cout<<"Background: ";
+		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(cout, " "));
+		cout<<": "<<bgfitness<<endl;
+	}
+}
+
 Pattern Habitat::createBackground()
 {
 	vector<double> genome; 
 	vector<double> target(1,0);
 
 	if(type == H1){
-		/* Background 1 contains 2 1's and 1 3's */
-		//genome.push_back(1); genome.push_back(1); genome.push_back(3);
-
-		/* Fill up with numbers != 1 and 3 */
-		//while(genome.size() < genomeSize){
-		//	uint value = round(pg->drawRandomNumber()*maxGenomeVal);
-		//	if(value != 1 and value != 3) genome.push_back(value);
-		//}
 		while(genome.size() < genomeSize){
 			genome.push_back(pg->drawRandomNumber(maxGenomeVal+1));
 		}
 		fill(genome.begin(), genome.begin()+genomeSize/2+1, 1);
-		//fill(genome.begin(), genome.end(), 1);
 	}else{
-		/* Background 1 contains 2 2's and 1 4's */
-		genome.push_back(2); genome.push_back(2); genome.push_back(4);
-
-		/* Fill up with numbers != 2 and 4 */
 		while(genome.size() < genomeSize){
-			uint value = round(pg->drawRandomNumber()*maxGenomeVal);
-			if(value != 2 and value != 4) genome.push_back(value);
+			genome.push_back(pg->drawRandomNumber(maxGenomeVal+1));
 		}
+		fill(genome.begin(), genome.begin()+genomeSize/2+1, 0);
 	}
 
 	random_shuffle(genome.begin(), genome.end());
@@ -125,6 +124,30 @@ Pattern Habitat::createBackground()
 Pattern Habitat::createIndividual()
 {
 	Individual individual(*pg);
+	return individual.getPattern();
+}
+
+bool Habitat::isIndividualPure(vector<double>& vec)
+{
+	bool pure=false;
+
+	if(type == H1){
+		uint sum = accumulate(vec.begin(), vec.end(), 0);
+		if(sum < 5) pure = true;
+	}else{
+		uint sum = accumulate(vec.begin(), vec.end(), 0);
+		if(sum > 3) pure = true;
+	}
+	return pure;
+}
+
+Pattern Habitat::createPureIndividual()
+{
+	Individual individual(*pg);
+	while(!isIndividualPure(individual.getGenome())){
+		Individual tmp(*pg);
+		individual = tmp;
+	}
 	return individual.getPattern();
 }
 
@@ -140,8 +163,10 @@ DataSet Habitat::createDataSet()
 	CoreDataSet* cds = new CoreDataSet();
 	DataSet ds;
 	for(uint i=0; i<individuals.size(); ++i){
-		cds->addPattern(createBackground());
-		cds->addPattern(individuals[i].getPattern());
+		if(isIndividualPure(individuals[i].getGenome())){
+			cds->addPattern(createBackground());
+			cds->addPattern(individuals[i].getPattern());
+		}
 	}
 	ds.coreDataSet(*cds);
 	return ds;
@@ -152,7 +177,7 @@ DataSet Habitat::createFeedbackDataSet()
 	CoreDataSet* cds = new CoreDataSet();
 	DataSet ds;
 	for(uint i=0; i<individuals.size(); ++i){
-		if(individuals[i].getFitness() < 0.5){
+		if(individuals[i].getFitness() < fitnessCutOff){
 			cds->addPattern(createBackground());
 			cds->addPattern(individuals[i].getPattern());
 		}
@@ -165,9 +190,9 @@ DataSet Habitat::createNewDataSet()
 {
 	CoreDataSet* cds = new CoreDataSet();
 	DataSet ds;
-	for(uint i=0; i<4*maxSize; ++i){
+	for(uint i=0; i<maxSize; ++i){
 		cds->addPattern(createBackground());
-		cds->addPattern(createIndividual());
+		cds->addPattern(createPureIndividual());
 	}
 	ds.coreDataSet(*cds);
 	return ds;
@@ -175,7 +200,8 @@ DataSet Habitat::createNewDataSet()
 
 void Habitat::trainPredator(bool init)
 {
-	DataSet ds = init == true ? createNewDataSet() : createFeedbackDataSet();
+	//DataSet ds = init == true ? createNewDataSet() : createFeedbackDataSet();
+	DataSet ds = init == true ? createNewDataSet() : createDataSet();
 	cout<<"DataSet Size: "<<ds.size()<<endl;
 	if(ds.size() > 0){
 		predator->train(ds);
@@ -185,17 +211,20 @@ void Habitat::trainPredator(bool init)
 	ds.killCoreData();
 }
 
-void Habitat::killOffPrey()
+uint Habitat::killOffPrey()
 {
+	uint n=individuals.size();
 	vector<Individual>::iterator it=individuals.begin(); 
 	while(it!=individuals.end())
-		if(it->getFitness() < 0.5)
+		if(it->getFitness() < fitnessCutOff)
 			it = individuals.erase(it);
 		else
 			++it;
+	return n-individuals.size();
 }
 
 void Habitat::replicate(){
+	assert(individuals.size() != 0);
 	vector<Individual> tmp;
 	//for(uint i=0; i<individuals.size(); ++i){
 	for(uint i=0; i<maxSize; ++i){
@@ -207,11 +236,24 @@ void Habitat::replicate(){
 		vector<double> genome2 = individuals[rnd2].getGenome();
 		genome.insert(genome.end(), genome2.begin()+genome2.size()/2, genome2.end());
 		//Mutate every 20th genome
-		if(pg->drawRandomNumber() < 0.05)
+		if(pg->drawRandomNumber() < mutationRate)
 			genome[pg->drawRandomNumber(genome.size())] = pg->drawRandomNumber(maxGenomeVal+1);
 		Individual individual(*pg);
 		individual.setGenome(genome);
 		tmp.push_back(individual);
 	}
 	individuals = tmp;
+}
+
+/** \TODO When to do migration? What if there is already a full Habitat? */
+void Habitat::migrate(Habitat& habitat){
+	vector<Individual> individuals2 = habitat.getIndividuals();
+	//assert(individuals.size() == individuals2.size());
+	for(uint i=0; i<migrationRate*individuals.size(); ++i){
+		uint rnd1 = pg->drawRandomNumber(individuals.size());
+		uint rnd2 = pg->drawRandomNumber(individuals2.size());
+		Individual tmp = individuals[rnd1];
+		individuals[rnd1] = individuals2[rnd2];
+		individuals2[rnd2] = tmp;
+	}
 }
