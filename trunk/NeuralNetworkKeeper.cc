@@ -28,7 +28,7 @@ using DataTools::DataSet;
 /** TODO: Make sure this initial dataset is handled in a better way! */
 NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSet(0)
 {
-	vector<uint> arch; arch.push_back(numVar); arch.push_back(1); arch.push_back(1);
+	vector<uint> arch; arch.push_back(numVar); arch.push_back(4); arch.push_back(1);
 	vector<string> types; types.push_back("tansig"); types.push_back("logsig");
 	mlp = new Mlp(arch, types, false);
 	dataSet = dataGenerator.createInitialDataSet(100);

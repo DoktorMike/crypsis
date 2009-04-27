@@ -10,6 +10,7 @@
 #include <neuralnethack/datatools/DataSet.hh>
 
 #include <vector>
+#include <iostream>
 
 enum HabitatType { H1=1, H2=2 };
 
@@ -21,16 +22,20 @@ class Habitat
 		~Habitat();
 
 		void scoreIndividuals(); /** Make the Predator run through the Habitat. */
-		void killOffPrey(); /** Make the Predator run through the Habitat. */
+		uint killOffPrey(); /** Make the Predator run through the Habitat. Return number of Individuals killed. */
 		double getAverageSum(); /** Get the average sum of all alleles in the genome of the population. */
 		double getAverageFitness(); /** Get the average fitness of the population. */
+		double getAverageBackgroundFitness(); /** Get the average fitness of the background. */
+		void printIndividuals(std::ostream& os); /** Print the Individuals and their fitness. */
 		uint getNumIndividuals() { return individuals.size(); } /** Get the number of Individual in this Habitat. */
+		std::vector<Individual>& getIndividuals() { return individuals; } /** Get all Individuals in the Habitat. */
 
 		/** Trains the Predator on the Habitat. */
 		void trainPredator(bool init);
-
 		/** Creates a new population from the old one. */
 		void replicate();
+		/** Migrates Individual from both Habitat. */
+		void migrate(Habitat& habitat);
 
 
 	private:
@@ -43,6 +48,10 @@ class Habitat
 		DataTools::Pattern createBackground();
 		/** Creates a random Individual and returns it as a pattern. */
 		DataTools::Pattern createIndividual();
+		/** Creates a pure Individual that is for sure not a background. */
+		DataTools::Pattern createPureIndividual();
+		/** Checks if an Individual is pure or not. */
+		bool isIndividualPure(std::vector<double>& vec);
 		/** Creates a DataSet that contains every Individual present in the Habitat. */
 		DataTools::DataSet createDataSet();
 		/** Creates a new DataSet that does not contain any Individual present in the Habitat. */
