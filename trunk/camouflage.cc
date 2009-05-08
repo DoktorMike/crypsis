@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cstdlib>
+#include <utility>
 
 #include <neuralnethack/Config.hh>
 #include <neuralnethack/mlp/Mlp.hh>
@@ -19,6 +20,7 @@ using std::vector;
 using std::cout;
 using std::accumulate;
 using std::endl;
+using std::pair;
 
 using namespace NeuralNetHack;
 using namespace MultiLayerPerceptron;
@@ -70,26 +72,43 @@ int main(int argc, char* argv[])
 	meanValues();
 	*/
 
-	Habitat h1(H1);
-	Habitat h2(H2);
+	std::ofstream population1("population1.txt");
+	std::ofstream population2("population2.txt");
 
+	Habitat h1(H1);
+	Habitat h2(H2); h2.exterminate();
+
+	uint generationCounter = 0;
 	while(true){
+		cout<<"Generation: "<<++generationCounter<<endl;
+		// Score Individuals
 		h1.scoreIndividuals();
 		h2.scoreIndividuals();
+		// Print it
+		h1.printIndividuals(population1);
+		h2.printIndividuals(population2);
 		cout<<"Average Fitness: H1 = "<<h1.getAverageFitness()<<" H2 = "<<h2.getAverageFitness()<<endl;
 		cout<<"Average Background Fitness: H1 = "<<h1.getAverageBackgroundFitness()<<" H2 = "<<h2.getAverageBackgroundFitness()<<endl;
 		//cout<<"Average Sum: H1 = "<<h1.getAverageSum()<<" H2 = "<<h2.getAverageSum()<<endl;
 		cout<<"Number of individuals: H1 = "<<h1.getNumIndividuals()<<" H2 = "<<h2.getNumIndividuals()<<endl;
 		sleep(1);
+		// Train the predator
 		h1.trainPredator(false);
 		h2.trainPredator(false);
+		// Kill less fit individuals
 		uint n1Killed = h1.killOffPrey();
 		uint n2Killed = h2.killOffPrey();
 		cout<<"Killed off: H1 = "<<n1Killed<<" H2 = "<<n2Killed<<" individuals"<<endl;
+		// Migration between the habitats
+		pair<uint, uint> nMigrated = h1.migrate(h2);
+		cout<<"Migrated from: H1 = "<<nMigrated.first<<" H2 = "<<nMigrated.second<<" individuals"<<endl;
+		// Replication
 		h1.replicate();
 		h2.replicate();
-
-		h1.migrate(h2);
 	}
+
+	population1.close();
+	population2.close();
+
 	return EXIT_SUCCESS;
 }
