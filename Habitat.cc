@@ -13,6 +13,7 @@
 #include <numeric>
 #include <iterator>
 #include <iostream>
+#include <utility>
 
 using DataTools::Pattern;
 using DataTools::DataSet;
@@ -25,6 +26,7 @@ using std::copy;
 using std::accumulate;
 using std::fill;
 using std::ostream;
+using std::pair;
 
 Habitat::Habitat(HabitatType type):pg(new PopulationGenerator()), individuals(maxSize, *pg), type(type), predator(new Predator())
 {
@@ -87,14 +89,14 @@ void Habitat::printIndividuals(ostream& os)
 {
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
 		double indfitness = it->getFitness();
-		cout<<"Individual: ";
-		copy(it->getGenome().begin(), it->getGenome().end(), ostream_iterator<double>(cout, " "));
-		cout<<": "<<indfitness<<"\t";
+		os<<"Individual: ";
+		copy(it->getGenome().begin(), it->getGenome().end(), ostream_iterator<double>(os, " "));
+		os<<": "<<indfitness<<"\t";
 		vector<double> bggenome = createBackground().input();
 		double bgfitness = 1-predator->predate(bggenome);
-		cout<<"Background: ";
-		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(cout, " "));
-		cout<<": "<<bgfitness<<endl;
+		os<<"Background: ";
+		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(os, " "));
+		os<<": "<<bgfitness<<endl;
 	}
 }
 
@@ -216,18 +218,29 @@ uint Habitat::killOffPrey()
 	uint n=individuals.size();
 	vector<Individual>::iterator it=individuals.begin(); 
 	while(it!=individuals.end())
-		if(it->getFitness() < fitnessCutOff)
+		if(it->getFitness() < fitnessCutOff && individuals.size() > minSizeFrac*maxSize)
 			it = individuals.erase(it);
 		else
 			++it;
 	return n-individuals.size();
 }
 
+uint Habitat::exterminate()
+{
+	uint n=individuals.size();
+	vector<Individual>::iterator it=individuals.begin(); 
+	individuals.erase(individuals.begin(), individuals.end());
+	return n;
+}
+
 void Habitat::replicate(){
+	// Sanity check
 	assert(individuals.size() != 0);
+	if(individuals.size() >= maxSize) return;
+
 	vector<Individual> tmp;
-	//for(uint i=0; i<individuals.size(); ++i){
-	for(uint i=0; i<maxSize; ++i){
+	uint howmany = (maxSize < 2*individuals.size()+1) ? maxSize : 2*individuals.size()+1;
+	for(uint i=0; i<howmany; ++i){
 		uint rnd1 = pg->drawRandomNumber(individuals.size());
 		uint rnd2 = pg->drawRandomNumber(individuals.size());
 		vector<double> genome;
@@ -246,14 +259,26 @@ void Habitat::replicate(){
 }
 
 /** \TODO When to do migration? What if there is already a full Habitat? */
-void Habitat::migrate(Habitat& habitat){
-	vector<Individual> individuals2 = habitat.getIndividuals();
-	//assert(individuals.size() == individuals2.size());
-	for(uint i=0; i<migrationRate*individuals.size(); ++i){
-		uint rnd1 = pg->drawRandomNumber(individuals.size());
-		uint rnd2 = pg->drawRandomNumber(individuals2.size());
-		Individual tmp = individuals[rnd1];
-		individuals[rnd1] = individuals2[rnd2];
-		individuals2[rnd2] = tmp;
+std::pair<uint, uint> Habitat::migrate(Habitat& habitat){
+	vector<Individual>& individuals2 = habitat.getIndividuals();
+
+	vector<Individual> tmp1;
+	uint nMigrate1 = migrationRate*individuals.size();
+	for(uint i=0; i<nMigrate1; ++i){
+		uint rnd = pg->drawRandomNumber(individuals.size());
+		tmp1.push_back(individuals[rnd]);
+		individuals.erase(individuals.begin()+rnd);
 	}
+	vector<Individual> tmp2;
+	uint nMigrate2 = migrationRate*individuals2.size();
+	for(uint i=0; i<nMigrate2; ++i){
+		uint rnd = pg->drawRandomNumber(individuals2.size());
+		tmp2.push_back(individuals2[rnd]);
+		individuals2.erase(individuals2.begin()+rnd);
+	}
+
+	individuals.insert(individuals.begin(), tmp2.begin(), tmp2.end());
+	individuals2.insert(individuals2.begin(), tmp1.begin(), tmp1.end());
+
+	return std::make_pair<uint, uint>(nMigrate1, nMigrate2);
 }

@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <utility>
 
 enum HabitatType { H1=1, H2=2 };
 
@@ -23,6 +24,7 @@ class Habitat
 
 		void scoreIndividuals(); /** Make the Predator run through the Habitat. */
 		uint killOffPrey(); /** Make the Predator run through the Habitat. Return number of Individuals killed. */
+		uint exterminate(); /** Kill everything in the Habitat. Return number of Individuals killed. */
 		double getAverageSum(); /** Get the average sum of all alleles in the genome of the population. */
 		double getAverageFitness(); /** Get the average fitness of the population. */
 		double getAverageBackgroundFitness(); /** Get the average fitness of the background. */
@@ -35,7 +37,7 @@ class Habitat
 		/** Creates a new population from the old one. */
 		void replicate();
 		/** Migrates Individual from both Habitat. */
-		void migrate(Habitat& habitat);
+		std::pair<uint, uint> migrate(Habitat& habitat);
 
 
 	private:

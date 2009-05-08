@@ -4,3 +4,4 @@ static const uint maxSize = 50; /** The maximum number of Individual in this hab
 static const double mutationRate = 0.05; /** The mutation rate for individuals during replication */
 static const double migrationRate = 0.10; /** The migration rate for the Habitat */
 static const double fitnessCutOff = 0.5; /** The fitness at which a background becomes a prey */
+static const double minSizeFrac = 0.05; /** The minimum size of a Habitat in percent of maxSize. */
