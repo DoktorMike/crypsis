@@ -28,7 +28,10 @@ class Habitat
 		double getAverageSum(); /** Get the average sum of all alleles in the genome of the population. */
 		double getAverageFitness(); /** Get the average fitness of the population. */
 		double getAverageBackgroundFitness(); /** Get the average fitness of the background. */
+		std::vector<double> getAverageIndividual(); /** Get the average Individual from the Habitat. */
+		std::vector<double> getFeatureValues(); /** Get the feature value for all Individuals in the Habitat. */
 		void printIndividuals(std::ostream& os); /** Print the Individuals and their fitness. */
+		void printMedianIndividual(std::ostream& os); /** Print the average Individual. */
 		uint getNumIndividuals() { return individuals.size(); } /** Get the number of Individual in this Habitat. */
 		std::vector<Individual>& getIndividuals() { return individuals; } /** Get all Individuals in the Habitat. */
 

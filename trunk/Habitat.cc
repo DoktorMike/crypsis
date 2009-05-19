@@ -14,6 +14,7 @@
 #include <iterator>
 #include <iostream>
 #include <utility>
+#include <functional>
 
 using DataTools::Pattern;
 using DataTools::DataSet;
@@ -27,11 +28,21 @@ using std::accumulate;
 using std::fill;
 using std::ostream;
 using std::pair;
+using std::plus;
+using std::multiplies;
 
 Habitat::Habitat(HabitatType type):pg(new PopulationGenerator()), individuals(maxSize, *pg), type(type), predator(new Predator())
 {
+	vector<double> genome(genomeSize, 0);
+	/*
+	   for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
+	   Individual individual(*pg);
+	 	*it = individual;
+		}
+	*/
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
 		Individual individual(*pg);
+		individual.setGenome(genome);
 		*it = individual;
 	}
 	trainPredator(true);
@@ -63,6 +74,14 @@ double Habitat::getAverageSum()
 	return sum/individuals.size();
 }
 
+vector<double> Habitat::getFeatureValues()
+{
+	vector<double> featureValues;
+	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it)
+		featureValues.push_back(accumulate(it->getGenome().begin(), it->getGenome().end(), 0.0));
+	//cout<<"FeatureNum: "<<sum/individuals.size()<<"\tBgFeatureNum: "<<bgSum/individuals.size()<<endl;
+	return featureValues;
+}
 double Habitat::getAverageFitness()
 {
 	double average = 0;
@@ -85,6 +104,18 @@ double Habitat::getAverageBackgroundFitness()
 	return bgAverage/individuals.size();
 }
 
+vector<double> Habitat::getAverageIndividual()
+{
+	vector<double> medianIndividual(genomeSize, 0);
+	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
+		vector<double> indGenome = it->getGenome();
+		transform(medianIndividual.begin(), medianIndividual.end(), indGenome.begin(), medianIndividual.begin(), plus<double>());
+	}
+	transform(medianIndividual.begin(), medianIndividual.end(), medianIndividual.begin(), 
+			bind2nd(multiplies<double>(), 1/(double)individuals.size()));
+	return medianIndividual;
+}
+
 void Habitat::printIndividuals(ostream& os)
 {
 	for(vector<Individual>::iterator it=individuals.begin(); it!=individuals.end(); ++it){
@@ -98,6 +129,14 @@ void Habitat::printIndividuals(ostream& os)
 		copy(bggenome.begin(), bggenome.end(), ostream_iterator<double>(os, " "));
 		os<<": "<<bgfitness<<endl;
 	}
+}
+
+void Habitat::printMedianIndividual(ostream& os)
+{
+	os<<"Average: ";
+	vector<double> avgGenome = getAverageIndividual();
+	copy(avgGenome.begin(), avgGenome.end(), ostream_iterator<double>(os, " "));
+	os<<endl;
 }
 
 Pattern Habitat::createBackground()
@@ -215,15 +254,35 @@ void Habitat::trainPredator(bool init)
 
 uint Habitat::killOffPrey()
 {
-	uint n=individuals.size();
-	vector<Individual>::iterator it=individuals.begin(); 
-	while(it!=individuals.end())
-		if(it->getFitness() < fitnessCutOff && individuals.size() > minSizeFrac*maxSize)
-			it = individuals.erase(it);
-		else
-			++it;
-	return n-individuals.size();
+	vector< pair< double, uint > > inds;
+	for(uint i=0; i<individuals.size(); ++i){
+		inds.push_back(std::make_pair(individuals[i].getFitness(), i));
+	}
+	sort(inds.begin(), inds.end());
+
+	vector< pair< double, uint > >::reverse_iterator it=inds.rbegin();
+	vector<Individual> newinds;
+	while(newinds.size() < (1-killOffRate)*individuals.size()){
+		newinds.push_back(individuals[it->second]);
+		++it;
+	}
+	individuals=newinds;
+	return inds.size()-newinds.size();
 }
+
+/*
+   uint Habitat::killOffPrey()
+   {
+   uint n=individuals.size();
+   vector<Individual>::iterator it=individuals.begin(); 
+   while(it!=individuals.end())
+   if(it->getFitness() < fitnessCutOff && individuals.size() > minSizeFrac*maxSize)
+   it = individuals.erase(it);
+   else
+   ++it;
+   return n-individuals.size();
+   }
+   */
 
 uint Habitat::exterminate()
 {

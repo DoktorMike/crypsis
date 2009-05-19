@@ -26,7 +26,7 @@ using std::ostream_iterator;
 using DataTools::DataSet;
 
 /** TODO: Make sure this initial dataset is handled in a better way! */
-NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSet(0)
+NeuralNetworkKeeper::NeuralNetworkKeeper(uint numVar):mlp(0), trainer(0), dataSet(0), os("traininglog.txt")
 {
 	vector<uint> arch; arch.push_back(numVar); arch.push_back(4); arch.push_back(1);
 	vector<string> types; types.push_back("tansig"); types.push_back("logsig");
@@ -48,11 +48,12 @@ NeuralNetworkKeeper::~NeuralNetworkKeeper()
 		dataSet->killCoreData(); 
 		delete dataSet; 
 	}
+	os.close();
 }
 
 void NeuralNetworkKeeper::train(DataSet& dataset)
 {
-	trainer->train(*mlp, dataset, cout);
+	trainer->train(*mlp, dataset, os);
 }
 
 double NeuralNetworkKeeper::propagate(vector<double>& genome)
