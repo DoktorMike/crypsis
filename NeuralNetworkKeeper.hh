@@ -11,6 +11,8 @@
 #include <neuralnethack/datatools/DataSet.hh>
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 class NeuralNetworkKeeper
 {
@@ -34,6 +36,8 @@ class NeuralNetworkKeeper
 		DataTools::DataSet* dataSet;
 		PopulationGenerator dataGenerator;
 		//const uint sampleSize;
+		std::ofstream os;
+
 };
 
 #endif
