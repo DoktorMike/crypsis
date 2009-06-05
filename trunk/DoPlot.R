@@ -4,9 +4,9 @@ dat<-read.table('featurevalues.txt', header=T)
 
 # Plot the distribution of feature values
 png("MigrationRate05.png")
-plot(dat1, ylim=c(0,8))
-points(dat2, ylim=c(0,8), col='blue', xlab="Generation", ylab="Average feature value")
-title('Migration rate = 0.05')
+plot(dat1, ylim=c(0,8), xlab="Generation", ylab="Average phenotype value", pch=19+1, col='black')
+points(dat2, ylim=c(0,8), pch=19+1, col='grey')
+title('Dispersal rate = 0.05')
 dev.off()
 
 # Test if the featureValues of the Habitats are different
@@ -22,6 +22,7 @@ dev.off()
 png("FeatureValDistributionBarplot05.png")
 hab1<-factor(dat$Habitat1, levels=c(0:8))
 hab2<-factor(dat$Habitat2, levels=c(0:8))
-barplot(rbind(table(hab1), table(hab2)), beside=TRUE, xlab="Feature value", ylab="Frequency")
-title('Feature value distribution, d=0.05')
+#barplot(rbind(table(hab1), table(hab2)), beside=TRUE, xlab="Phenotype value", ylab="Frequency", , col=c(0,1))
+barplot(rbind(table(hab1), table(hab2)), beside=TRUE, xlab="Phenotype value", ylab="Frequency")
+title('Dispersal rate = 0.05')
 dev.off()

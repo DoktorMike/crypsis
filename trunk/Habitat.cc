@@ -271,18 +271,18 @@ uint Habitat::killOffPrey()
 }
 
 /*
-   uint Habitat::killOffPrey()
-   {
-   uint n=individuals.size();
-   vector<Individual>::iterator it=individuals.begin(); 
-   while(it!=individuals.end())
-   if(it->getFitness() < fitnessCutOff && individuals.size() > minSizeFrac*maxSize)
-   it = individuals.erase(it);
-   else
-   ++it;
-   return n-individuals.size();
-   }
-   */
+uint Habitat::killOffPrey()
+{
+	uint n=individuals.size();
+	vector<Individual>::iterator it=individuals.begin(); 
+	while(it!=individuals.end())
+		if(it->getFitness() < fitnessCutOff && individuals.size() > minSizeFrac*maxSize)
+			it = individuals.erase(it);
+		else
+			++it;
+	return n-individuals.size();
+}
+*/
 
 uint Habitat::exterminate()
 {

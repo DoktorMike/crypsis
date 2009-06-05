@@ -15,6 +15,7 @@
 #include "Predator.hh"
 #include "Habitat.hh"
 #include "NeuralNetworkKeeper.hh"
+#include "Constants.hh"
 
 using std::string;
 using std::vector;
@@ -94,7 +95,7 @@ int main(int argc, char* argv[])
 	Habitat h2(H2); //h2.exterminate();
 
 	uint generationCounter = 0;
-	while(generationCounter<1000){
+	while(generationCounter<numGenerations){
 		cout<<"Generation: "<<++generationCounter<<endl;
 		// Score Individuals
 		h1.scoreIndividuals();
@@ -136,10 +137,17 @@ int main(int argc, char* argv[])
 	vector<double> featureValues1 = h1.getFeatureValues();
 	vector<double> featureValues2 = h2.getFeatureValues();
 	std::ofstream featvals("featurevalues.txt");
-	assert(featureValues1.size() == featureValues2.size());
+	//assert(featureValues1.size() == featureValues2.size());
 	featvals<<"Ind"<<"\t"<<"Habitat1"<<"\t"<<"Habitat2"<<endl;
-	for(uint i=0; i<featureValues1.size(); ++i)
-		featvals<<i<<"\t"<<featureValues1[i]<<"\t"<<featureValues2[i]<<endl;
+	uint nmax = featureValues1.size() > featureValues2.size()  ? featureValues1.size() : featureValues2.size();
+	uint nmin = featureValues1.size() < featureValues2.size()  ? featureValues1.size() : featureValues2.size();
+	for(uint i=0; i<nmax; ++i)
+		if(featureValues1.size() > featureValues2.size())
+			if (i < nmin) featvals<<i<<"\t"<<featureValues1[i]<<"\t"<<featureValues2[i]<<endl;
+			else featvals<<i<<"\t"<<featureValues1[i]<<"\t"<<"NA"<<endl;
+		else
+			if (i < nmin) featvals<<i<<"\t"<<featureValues1[i]<<"\t"<<featureValues2[i]<<endl;
+			else featvals<<i<<"\t"<<"NA"<<"\t"<<featureValues2[i]<<endl;
 	featvals.close();
 
 	return EXIT_SUCCESS;

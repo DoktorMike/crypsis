@@ -6,3 +6,4 @@ static const double migrationRate = 0.2; /** The migration rate for the Habitat 
 static const double fitnessCutOff = 0.5; /** The fitness at which a background becomes a prey */
 static const double minSizeFrac = 0.05; /** The minimum size of a Habitat in percent of maxSize. */
 static const double killOffRate = 0.25; /** The percentage of Prey to kill off each generateion. */
+static const double numGenerations = 500; /** The number of generations to run. */
