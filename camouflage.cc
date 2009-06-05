@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 	Habitat h2(H2); //h2.exterminate();
 
 	uint generationCounter = 0;
-	while(generationCounter<200){
+	while(generationCounter<1000){
 		cout<<"Generation: "<<++generationCounter<<endl;
 		// Score Individuals
 		h1.scoreIndividuals();
